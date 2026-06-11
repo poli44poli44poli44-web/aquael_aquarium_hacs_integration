@@ -8,6 +8,7 @@
   "codeowners": [
     "@poli44poli44poli44-web"
   ],
+  "dependencies": ["http"],
   "iot_class": "local_polling",
   "requirements": []
 }
