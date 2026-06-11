@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>HyperMAX</title>
+<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="stylesheet" href="FlowStyle.css">
+<style>
+  html,body{margin:0;height:100%;background:radial-gradient(ellipse at center,#fffeea 0,#fffeea 35%,#c8e1e2 100%);font-family:'Lato',sans-serif}
+  .toggle{margin:14px auto}
+  .current{font-size:90px;font-weight:800;color:#172317;text-align:center;margin:8px 0}
+  .current sup{font-size:34px}
+  .hint{max-width:80%;margin:26px auto 0;color:#4d5b4e;font-size:18px;font-weight:800;text-align:center;line-height:1.3}
+  .warn{color:#b00;font-weight:700;text-align:center;margin:6px 16px;font-size:15px}
+  .measured{margin-top:24px;color:#172317;font-size:24px;text-align:center}
+  .measured sup{font-size:12px}
+  .powerline{margin-top:8px;color:#555;font-size:16px;text-align:center}
+  [v-cloak]{display:none}
+</style>
+</head>
+<body>
+<div id="app" v-cloak>
+  <label class="toggle">
+    <input type="checkbox" :checked="isOn" @change="toggle($event)" />
+    <span class="btn"></span><span class="labels"></span><span class="bg"></span>
+  </label>
+
+  <div v-if="!isOn" id="offinfo">{{ offText }}</div>
+
+  <div v-if="isOn">
+    <p v-if="mode==='thermostat' && !pumpOn" class="warn">Pompa wyłączona. Tryb termostatowania nie może zacząć pracy.</p>
+    <p v-if="mode==='thermostat' && waterOk===false" class="warn">Zbyt niski poziom wody. Tryb termostatowania nie zacznie pracy, dopóki problem nie zostanie usunięty.</p>
+
+    <div class="current">{{ display(currentVal) }}<sup>{{ unit }}</sup></div>
+
+    <input-spinner
+      :min="min" :max="max"
+      :interval="interval" :timer-step="timerStep" :thresholds="thresholds"
+      @update="updateValue"></input-spinner>
+
+    <p class="hint">Przytrzymaj i przeciągnij kulkę, aby zmienić nastawę.</p>
+
+    <div v-if="mode==='thermostat'" class="measured">Aktualna: {{ measured==null ? '—' : display(measured) }}<sup>{{ unit }}</sup></div>
+    <div v-if="mode==='thermostat'" class="powerline">Moc grzania: {{ power==null ? '—' : power }}%</div>
+  </div>
+</div>
+
+
+<script>
+  var Q = new URLSearchParams(location.hash.slice(1));
+  var HA_TOKEN = Q.get('token') || '';
+  var MODE = Q.get('mode') || 'thermostat';
+  var INIT_VALUE = parseFloat(Q.get('value'));
+  if (isNaN(INIT_VALUE)) INIT_VALUE = (MODE === 'thermostat') ? 24 : 50;
+  var powerFunctions = { getCurrentPower: function(){ return INIT_VALUE; } };
+</script>
+<script src="vue.min.js"></script>
+<script src="inputspinner.js"></script>
+<script>
+(function(){
+  var ENT = {
+    thermostat: Q.get('climate'),
+    pump: Q.get('pump'),
+    number: Q.get('number'),
+    measured: Q.get('measured'),
+    power: Q.get('power'),
+    water: Q.get('water'),
+  };
+  function api(path, opts){
+    opts = opts || {};
+    opts.headers = Object.assign({'Authorization':'Bearer '+HA_TOKEN,'Content-Type':'application/json'}, opts.headers||{});
+    return fetch('/api/'+path, opts);
+  }
+  function getState(entity){
+    if(!entity) return Promise.resolve(null);
+    return api('states/'+entity).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  function callService(domain, service, data){
+    return api('services/'+domain+'/'+service, {method:'POST', body: JSON.stringify(data)});
+  }
+
+  var CFG = (MODE === 'thermostat')
+    ? { min:20, max:33, unit:'°C', timerStep:5, interval:1000, thresholds:[{threshold:30,value:0.1},{threshold:100,value:1}], decimals:1,
+        offText:'Tryb termostatowania jest wyłączony. Włącz go przełącznikiem powyżej.' }
+    : { min:20, max:100, unit:'%', timerStep:5, interval:1000, thresholds:[{threshold:30,value:1},{threshold:100,value:10}], decimals:0,
+        offText:'Pompa jest wyłączona. Włącz ją przełącznikiem powyżej.' };
+
+  new Vue({
+    el:'#app',
+    components:{ 'input-spinner': InputSpinner },
+    data:{
+      mode: MODE, unit: CFG.unit, min: CFG.min, max: CFG.max,
+      interval: CFG.interval, timerStep: CFG.timerStep, thresholds: CFG.thresholds,
+      offText: CFG.offText,
+      currentVal: INIT_VALUE,
+      isOn: true, pumpOn: true, waterOk: true, measured: null, power: null,
+    },
+    mounted: function(){ this.refresh(); var self=this; setInterval(function(){ self.refresh(); }, 4000); },
+    methods:{
+      display: function(v){ return Number(v).toFixed(CFG.decimals); },
+      refresh: function(){
+        var self=this;
+        if (MODE==='thermostat'){
+          getState(ENT.thermostat).then(function(s){ if(!s) return; var a=s.attributes;
+            self.isOn = s.state==='heat';
+            if(a.temperature!=null) self.currentVal = Number(a.temperature);
+            self.measured = a.current_temperature!=null ? Number(a.current_temperature) : null;
+            self.power = a.top_heater_power!=null ? Number(a.top_heater_power) : null;
+            if(a.pump_enabled!=null) self.pumpOn = a.pump_enabled===true;
+            if(a.water_sensor_flooded!=null) self.waterOk = a.water_sensor_flooded===true;
+          });
+        } else {
+          getState(ENT.number).then(function(s){ if(s){ self.currentVal = Number(s.state); } });
+          getState(ENT.pump).then(function(s){ if(s) self.isOn = s.state==='on'; });
+        }
+      },
+      toggle: function(e){
+        var on = e.target.checked;
+        if (MODE==='thermostat'){
+          callService('climate','set_hvac_mode',{entity_id:ENT.thermostat, hvac_mode: on?'heat':'off'});
+        } else {
+          callService('switch', on?'turn_on':'turn_off', {entity_id:ENT.pump});
+        }
+        this.isOn = on;
+      },
+      updateValue: function(val){
+        val = Math.max(this.min, Math.min(this.max, val));
+        this.currentVal = val;
+        if (MODE==='thermostat'){
+          callService('climate','set_temperature',{entity_id:ENT.thermostat, temperature: Number(val.toFixed(1))});
+        } else {
+          callService('number','set_value',{entity_id:ENT.number, value: Math.round(val)});
+        }
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>

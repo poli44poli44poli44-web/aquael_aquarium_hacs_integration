@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<head>
+    <meta charset=UTF-8>
+    <title>Flow Rate</title>
+    <meta charset=UTF-8 name=viewport content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel=stylesheet href=FlowStyle.css>
+    <style id="ha-fit">
+      html,body{margin:0;height:100%;overflow:hidden;}
+      #LangElement{position:absolute;top:128px;left:0;width:460px;min-height:820px;transform-origin:top left;}
+      .current{font-size:96px !important;margin-bottom:18px !important;}
+      #app{padding-top:80px;box-sizing:border-box;}
+    </style>
+    <script>
+      function haFit(){
+        var DW=460, DH=820, TOP=128, w=document.getElementById('LangElement');
+        if(!w) return;
+        var s=Math.min(window.innerWidth/DW, Math.max(1, window.innerHeight-TOP)/DH);
+        if(!isFinite(s)||s<=0) s=1;
+        s=Math.min(s,1);
+        w.style.transform='scale('+s+')';
+        w.style.top=TOP+'px';
+        w.style.left=Math.max(0,(window.innerWidth-DW*s)/2)+'px';
+      }
+      window.addEventListener('resize',haFit);
+      window.addEventListener('load',haFit);
+      document.addEventListener('DOMContentLoaded',haFit);
+      setInterval(haFit,800);
+    </script>
+</head>
+
+<body>
+    <div id=LangElement>
+        <div id=container>
+            <div class=toggle>
+                <input type=checkbox />
+                <span class=btn></span>
+                <span class=labels></span>
+                <span class=bg></span>
+            </div>
+        </div>
+        <div id=app v-cloak>
+            <div id=text-visability>
+                <span class=localized data-content=INFO></span>
+            </div>
+            <div class=app__content id=IDapp__content>
+                <div id=text-visability2>
+                    <span class=localized data-content=FLOW></span>
+                </div>
+                <transition name=current-value mode=out-in>
+                    <div class=current :key=currentVal>{{ currentVal }}<sup style="font-size: 40px">%</sup></div>
+                </transition>
+                <input-spinner :min=min :max=max @update=updateValue :interval=interval :thresholds=thresholds :timer-step=timerStep></input-spinner>
+                <div id=text3>
+                    <p style=margin-top:3em;font-size:15px><span class=localized data-content=DRAG></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src=jquery.min.js></script>
+    <script src=vue.min.js></script>
+    <script src=prefixfree.min.js></script>
+    <script src=jquery.ripples.js></script>
+    <!-- HA bridge: replaces the native powerFunctions / window.webkit, then loads the ORIGINAL FlowScript.js verbatim -->
+    <script>
+    (function () {
+      var Q = new URLSearchParams(location.hash.slice(1));
+      var TOKEN = Q.get('token') || '';
+      var NUMBER = Q.get('number') || '';
+      var PUMP = Q.get('pump') || '';
+      function api(path, opts) {
+        opts = opts || {};
+        opts.headers = Object.assign({ 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' }, opts.headers || {});
+        return fetch('/api/' + path, opts);
+      }
+      function getState(entity) {
+        if (!entity) return Promise.resolve(null);
+        return api('states/' + entity).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+      }
+      function callService(domain, service, data) {
+        return api('services/' + domain + '/' + service, { method: 'POST', body: JSON.stringify(data) });
+      }
+
+      Promise.all([getState(NUMBER), getState(PUMP)]).then(function (res) {
+        var effState = res[0];
+        var pumpState = res[1];
+        var efficiency = effState ? Math.round(Number(effState.state)) : 20;
+        var pumpOn = pumpState ? pumpState.state === 'on' : true;
+
+        window.powerFunctions = {
+          getCurrentPower: function () { return efficiency; },
+          isPumpEnabled: function () { return pumpOn; },
+          getDeviceLang: function () { return 'PL'; },
+          InternetConnection: function () { return false; },
+          getDeviceIp: function () { return ''; }
+        };
+        window.webkit = {
+          messageHandlers: {
+            savePower: { postMessage: function (m) {
+              var power = Math.round(Number(m.power));
+              var enabled = String(m.enabled) === 'true';
+              callService('switch', enabled ? 'turn_on' : 'turn_off', { entity_id: PUMP });
+              if (!isNaN(power)) callService('number', 'set_value', { entity_id: NUMBER, value: power });
+            } },
+            updateUserScript: { postMessage: function () {} }
+          }
+        };
+
+        var s = document.createElement('script');
+        s.src = 'FlowScript.js';
+        document.body.appendChild(s);
+      });
+    })();
+    </script>
+</body>
+</html>

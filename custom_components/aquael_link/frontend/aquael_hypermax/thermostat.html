@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<head>
+    <meta charset=UTF-8>
+    <title>Thermostating</title>
+    <meta charset=UTF-8 name=viewport content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel=stylesheet href=ThermostatingStyle.css>
+    <style id="ha-fit">
+      html,body{margin:0;height:100%;overflow:hidden;}
+      #LangElement{position:absolute;top:128px;left:0;width:460px;min-height:820px;transform-origin:top left;}
+      .current{font-size:96px !important;margin-bottom:18px !important;}
+      .current-unit{font-size:40px !important;vertical-align:super;line-height:0;}
+      #app{padding-top:80px;box-sizing:border-box;}
+    </style>
+    <script>
+      function haFit(){
+        var DW=460, DH=820, TOP=128, w=document.getElementById('LangElement');
+        if(!w) return;
+        var s=Math.min(window.innerWidth/DW, Math.max(1, window.innerHeight-TOP)/DH);
+        if(!isFinite(s)||s<=0) s=1;
+        s=Math.min(s,1);
+        w.style.transform='scale('+s+')';
+        w.style.top=TOP+'px';
+        w.style.left=Math.max(0,(window.innerWidth-DW*s)/2)+'px';
+      }
+      window.addEventListener('resize',haFit);
+      window.addEventListener('load',haFit);
+      document.addEventListener('DOMContentLoaded',haFit);
+      setInterval(haFit,800);
+    </script>
+</head>
+
+<body>
+    <div id=LangElement>
+        <div id=container>
+            <div class=toggle>
+                <input type=checkbox />
+                <span class=btn></span>
+                <span class=labels></span>
+                <span class=bg></span>
+            </div>
+        </div>
+        <div id=app v-cloak>
+            <div id=text-visability>
+                <span class=localized data-content=INFO></span>
+            </div>
+            <div class=app__content id=IDapp__content>
+                <div id=text4>
+                <p id="pump-off-warning" class="section" ><span class=localized data-content=PUMP_OFF></span></p>
+                <p id="water-level-warning" class="section"><span class=localized data-content=LEVEL></span></p>
+                </div>
+                <div id=text-visability2 >
+                    <span class=localized data-content=TEMPinfo></span>
+                </div>
+                <transition name=current-value mode=out-in>
+                    <div class="current" :key="currentVal">{{ roundToDecimal(currentVal , 1) }}<sup id=unit class="current-unit" :key="currentValUnit">{{ currentValUnit }}</sup></div>
+                </transition>
+                <input-spinner :min=min :max=max @update=updateValue :interval=interval :thresholds=thresholds :timer-step=timerStep></input-spinner>
+                <div id=text3>
+                    <p style=margin-top:3em;font-size:15px><span class=localized data-content=DRAG></span></p>
+                </div>
+                <div id="heater-work-icon" class="footer">
+                  <span class="footer-icon">
+                    <svg  height="20" width="20">
+                      <circle cx="10" cy="10" r="8" stroke="black" stroke-width="1.5" fill="red" />
+                    </svg>
+                  </span>
+                </div>
+                <footer>
+                        <span style="display: inline;">
+                          <p style="margin-top:3em;display:inline"><span class="localized" data-content="ATEMP"></span></p>
+                          {{ roundToDecimal(currentTemp , 1) }}<sup style="font-size: 12px">{{ currentValUnit }}</sup>
+                        </span>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <script src=jquery.min.js></script>
+    <script src=vue.min.js></script>
+    <script src=prefixfree.min.js></script>
+    <!-- HA bridge: replaces native heaterFunctions / window.webkit, then loads the ORIGINAL ThermostatingScript.js verbatim -->
+    <script>
+    (function () {
+      var Q = new URLSearchParams(location.hash.slice(1));
+      var TOKEN = Q.get('token') || '';
+      var CLIMATE = Q.get('climate') || '';
+      function api(path, opts) {
+        opts = opts || {};
+        opts.headers = Object.assign({ 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' }, opts.headers || {});
+        return fetch('/api/' + path, opts);
+      }
+      function getState(entity) {
+        if (!entity) return Promise.resolve(null);
+        return api('states/' + entity).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+      }
+      function callService(domain, service, data) {
+        return api('services/' + domain + '/' + service, { method: 'POST', body: JSON.stringify(data) });
+      }
+      function settingsFrom(s) {
+        var a = (s && s.attributes) || {};
+        var power = a.top_heater_power != null ? Number(a.top_heater_power) : 0;
+        return {
+          setTemperature: a.temperature != null ? Number(a.temperature) : 24,
+          measuredTemp: a.current_temperature != null ? Number(a.current_temperature) : -273.95,
+          isHeaterOn: s ? s.state === 'heat' : false,
+          isPumpEnabled: a.pump_enabled === true,
+          pumpEnabled: a.pump_enabled === true,
+          waterSensorFlooded: a.water_sensor_flooded === true,
+          heaterOutput: power > 0,
+          TopHeaterPower: power
+        };
+      }
+
+      getState(CLIMATE).then(function (s) {
+        var current = settingsFrom(s);
+
+        window.heaterFunctions = {
+          heaterSettings: function () { return JSON.stringify(current); },
+          getDeviceLang: function () { return 'PL'; },
+          getTemperatureUnit: function () { return 'C'; },
+          isHeaterOn: function () { return current.isHeaterOn; },
+          isPumpEnabled: function () { return current.isPumpEnabled; }
+        };
+        window.webkit = {
+          messageHandlers: {
+            saveTemperature: { postMessage: function (m) {
+              var temp = Number(m.temperature);
+              var on = String(m.isOn) === 'true';
+              callService('climate', 'set_hvac_mode', { entity_id: CLIMATE, hvac_mode: on ? 'heat' : 'off' });
+              if (!isNaN(temp)) callService('climate', 'set_temperature', { entity_id: CLIMATE, temperature: Number(temp.toFixed(1)) });
+            } },
+            updateUserScript: { postMessage: function () {} }
+          }
+        };
+
+        var s2 = document.createElement('script');
+        s2.src = 'ThermostatingScript.js';
+        document.body.appendChild(s2);
+
+        // live updates: refresh warnings/values from HA
+        setInterval(function () {
+          getState(CLIMATE).then(function (st) {
+            current = settingsFrom(st);
+            if (typeof onJsonReceived === 'function') {
+              try { onJsonReceived(JSON.stringify(current)); } catch (e) {}
+            }
+          });
+        }, 4000);
+      });
+    })();
+    </script>
+</body>
+</html>

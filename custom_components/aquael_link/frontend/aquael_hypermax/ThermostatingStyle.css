@@ -1,0 +1,557 @@
+textarea {
+    -webkit-touch-callout: auto;
+    -webkit-user-select: auto;
+}
+
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+}
+
+html,
+body {
+    height: 100%;
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
+    background-color: #F0F0F0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+}
+
+[v-cloak] {
+    display: none;
+}
+
+.app {
+    display: flex;
+    justify-content: center;
+    padding: 2em;
+    color: rgba(255, 0, 0, 0.8);
+}
+
+.app__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.current {
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
+    text-align: center;
+    color: rgba(0, 20, 0, 0.5);
+    
+    font-size: calc(30px + 10vh);
+    margin-bottom: 5vh;
+}
+
+.current-value-enter-active,
+.current-value-leave-active {
+    transition: all 0.2s ease;
+}
+
+.current-value-enter,
+.current-value-leave-to {
+    transform: scale(1.1);
+    opacity: 0.5;
+}
+
+.u-flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-spinner {
+    --position: 0%;
+    position: relative;
+    font-size: 20px;
+}
+
+.input-spinner:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 2em;
+    box-shadow: 0 0.1em 0.6em rgba(0, 0, 0, 0.7);
+    
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.input-spinner.is-dragging .input-spinner__knob {
+    transition: none;
+}
+
+.input-spinner.is-dragging .input-spinner__ball {
+    opacity: 1;
+    transform: translate3d(calc(-50% + var(--position)), 0, 0);
+    transition: opacity 0.2s;
+}
+
+.input-spinner.is-dragging:after {
+    opacity: 1;
+}
+
+.input-spinner__track {
+    z-index: 2;
+    position: relative;
+    overflow: hidden;
+    width: 12em;
+    border-radius: 2em;
+    background: rgba(25, 0, 25, 0.1);
+    
+}
+
+.input-spinner__track.is-max .input-spinner__icon--plus {
+    opacity: 0.3;
+}
+
+.input-spinner__track.is-min .input-spinner__icon--minus {
+    opacity: 0.3;
+}
+
+.input-spinner__icon {
+    position: absolute;
+    top: 50%;
+    width: 1.1em;
+    height: 1.1em;
+    fill: rgba(50, 50, 50, 0.9);
+    
+    transform: translate(0, -50%);
+    transition: opacity 0.3s;
+}
+
+.input-spinner__icon--plus {
+    right: 0.7em;
+}
+
+.input-spinner__icon--minus {
+    left: 0.7em;
+}
+
+.input-spinner__knob {
+    z-index: 1;
+    position: relative;
+    height: 2.5em;
+    width: 2.5em;
+    font-size: 1.2em;
+    color: rgba(255, 255, 255, 0);
+    
+    border-radius: 50%;
+    background: linear-gradient(rgba(253, 253, 253, 1) 0,
+            rgba(255, 255, 255, 1) 3%,
+            rgba(252, 252, 252, 1) 13%,
+            rgba(228, 228, 228, 1) 50%,
+            rgba(221, 221, 221, 1) 55%,
+            rgba(208, 208, 208, 1) 85%,
+            rgba(205, 205, 205, 1) 100%);
+    box-shadow: 0 5px 5px rgba(50, 50, 50, 0.2);
+    
+    cursor: pointer;
+    transform: translate3d(calc(var(--position)), 0, 0);
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    
+    will-change: transform;
+}
+
+.input-spinner__ball {
+    z-index: 3;
+    position: absolute;
+    overflow: hidden;
+    left: 50%;
+    bottom: 105%;
+    opacity: 0;
+    transform: translate3d(calc(-50% + var(--position)), 0, 0);
+    transition: opacity 0.2s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    will-change: transform;
+}
+
+.input-spinner__values {
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: rgba(0, 0, 0, 0.8);
+    
+    font-size: 0.6em;
+}
+
+.input-spinner__ball-bg {
+    width: 1.4em;
+    height: 1.4em;
+    fill: rgba(255, 255, 255, 0.4);
+    
+}
+
+.list-item {
+    display: inline-block;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.list-enter-active {
+    opacity: 0;
+    transform: translate3d(1em, 0, 0);
+    transition: transform 0.2s 0.1s, opacity 0.2s 0.12s;
+}
+
+.list-leave-active {
+    position: absolute;
+    top: 22%;
+    transform: translate3d(0, 0, 0);
+    transition: transform 0.3s, opacity 0.2s;
+}
+
+.list-enter-to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+.list-leave-to {
+    position: absolute;
+    top: 22%;
+    opacity: 0;
+    transform: translate3d(-1em, 0, 0);
+}
+
+.list--reverse-enter-active {
+    opacity: 0;
+    transform: translate3d(-1em, 0, 0);
+    transition: transform 0.2s 0.1s, opacity 0.2s 0.1s;
+}
+
+.list--reverse-leave-active {
+    position: absolute;
+    top: 22%;
+    transition: transform 0.3s, opacity 0.2s;
+}
+
+.list--reverse-enter-to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+.list--reverse-leave-to {
+    position: absolute;
+    top: 22%;
+    opacity: 0;
+    transform: translate3d(1em, 0, 0);
+}
+
+#container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.toggle {
+    position: relative;
+    width: 95px;
+    height: 35px;
+    border: 5px solid #e9e9e9;
+    border-radius: 40px;
+}
+
+.toggle input {
+    opacity: 0;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 6;
+    width: 84px;
+    height: 34px;
+}
+
+.toggle input:checked~.btn {
+    left: 50px;
+}
+
+.toggle input:checked~.bg {
+    background: linear-gradient(#809e2f, #a5c04d);
+}
+
+.toggle .btn {
+    display: block;
+    position: absolute;
+    z-index: 4;
+    top: -10px;
+    left: -5px;
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(rgba(253, 253, 253, 1) 0,
+            rgba(255, 255, 255, 1) 3%,
+            rgba(252, 252, 252, 1) 13%,
+            rgba(228, 228, 228, 1) 50%,
+            rgba(221, 221, 221, 1) 55%,
+            rgba(208, 208, 208, 1) 85%,
+            rgba(205, 205, 205, 1) 100%);
+    border: 2px solid #e8e8e8;
+    border-radius: 50px;
+    box-shadow: 0 5px 5px rgba(50, 50, 50, 0.2);
+    transition: left 0.25s ease;
+}
+
+.toggle .btn:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -12.5px;
+    margin-left: -12.5px;
+    width: 25px;
+    height: 25px;
+    box-shadow: inset 0 2px 5px 0 rgba(0, 0, 0, 0.08);
+    background: #e3e3e3;
+    border-radius: 50px;
+}
+
+.toggle .labels {
+    position: absolute;
+    top: 10px;
+    z-index: 2;
+    width: 100%;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
+    font-weight: bold;
+    color: #fff;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.toggle .labels:before {
+    content: "On";
+    position: absolute;
+    left: 12px;
+}
+
+.toggle .labels:after {
+    content: "Off";
+    position: absolute;
+    right: 12px;
+}
+
+.toggle .bg {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 40px;
+    box-shadow: inset 0 2px 5px 0 rgba(0, 0, 0, 0.2);
+    background: linear-gradient(#848484, #a2a2a2);
+}
+
+
+#text-visability,
+#text-visability2,
+#text3 {
+    text-align: center;
+    font-size: 20px;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
+    font-weight: bold;
+    color: rgba(0, 20, 0, 0.7);
+}
+
+#text4{
+    text-align: center;
+    font-size: 20px;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
+    font-weight: bold;
+    color: red;
+}
+footer {
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
+    text-align: center;
+    color: rgba(0, 20, 0, 0.9);
+    font-size: 20px;
+
+    
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+}
+
+.footer {
+    position: fixed;
+    top: 3%;
+    left: 6%;
+    margin: 1vw;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+}
+
+
+
+.footer-value {
+  margin-left: 1vw;
+  margin-right: 20px;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
+  color: rgba(0, 20, 0, 0.5);
+}
+
+
+#heater-work-icon {
+  margin-right: 10px;
+}
+
+
+
+#heater-temp {
+    position: fixed;
+    bottom: 50%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    margin: 1vw;
+}
+.localized:after {
+    content: attr(data-content);
+}
+
+[lang="PL"] [data-content="DRAG"]:after {
+    content: "Przytrzymaj i przeciągnij suwak,\a aby zmienić nastawę.";
+}
+
+[lang="ES"] [data-content="DRAG"]:after {
+    content: "Arrastre y mantenga el botón\a para establecer el valor.";
+}
+
+[lang="DE"] [data-content="DRAG"]:after {
+    content: "Ziehen und halten Sie den Knopf,\a um den Wert einzustellen.";
+}
+
+[lang="RU"] [data-content="DRAG"]:after {
+    content: "Перетащите и удерживайте ручку,\a чтобы установить значение.";
+}
+
+[lang="EN"] [data-content="DRAG"]:after {
+    content: "Drag and hold the knob\a to set the value.";
+}
+
+[lang="PL"] [data-content="TEMPinfo"]:after {
+    content: "TEMPERATURA";
+    }
+    
+    [lang="ES"] [data-content="TEMPinfo"]:after {
+    content: "TEMPERATURA";
+    }
+    
+    [lang="DE"] [data-content="TEMPinfo"]:after {
+    content: "TEMPERATUR";
+    }
+    
+    [lang="RU"] [data-content="TEMPinfo"]:after {
+    content: "ТЕМПЕРАТУРА";
+    }
+    
+    [lang="EN"] [data-content="TEMPinfo"]:after {
+    content: "TEMPERATURE";
+    }
+    
+    [lang="PL"] [data-content="INFO"]:after {
+    content: "Termostatowanie jest wyłączone. Włącz przełącznik, aby ustawić wartość.";
+    }
+    
+    [lang="ES"] [data-content="INFO"]:after {
+    content: "El control de temperatura está apagado. Encienda el interruptor para ajustar el valor.";
+    }
+    
+    [lang="DE"] [data-content="INFO"]:after {
+    content: "Die Temperaturkontrolle ist ausgeschaltet. Schalten Sie den Schalter ein, um den Wert einzustellen.";
+    }
+    
+    [lang="RU"] [data-content="INFO"]:after {
+    content: "Управление температурой выключено. Включите переключатель, чтобы установить значение.";
+    }
+    
+    [lang="EN"] [data-content="INFO"]:after {
+    content: "Temperature control is off. Turn on the switch to set the value.";
+    }
+
+
+
+[lang="PL"] [data-content="LEVEL"]:after {
+content: "Zbyt niski poziom wypełnienia wodą. Tryb termostatowania nie zacznie pracy dopóki problem nie zostanie usunięty.";
+}
+
+[lang="ES"] [data-content="LEVEL"]:after {
+content: "Nivel de agua demasiado bajo. El modo de termostato no se iniciará hasta que se resuelva el problema.";
+}
+
+[lang="DE"] [data-content="LEVEL"]:after {
+content: "Wasserstand zu niedrig. Der Thermostatmodus wird erst gestartet, wenn das Problem behoben ist.";
+}
+
+[lang="RU"] [data-content="LEVEL"]:after {
+content: "Слишком низкий уровень воды. Режим термостатирования не будет работать, пока проблема не будет устранена.";
+}
+
+[lang="EN"] [data-content="LEVEL"]:after {
+content: "Water level too low. Thermostat mode will not start working until the problem is resolved.";
+}
+
+[lang="PL"] [data-content="ATEMP"]:after {
+content: "Aktualna: ";
+}
+
+[lang="ES"] [data-content="ATEMP"]:after {
+content: "Actual: ";
+}
+
+[lang="DE"] [data-content="ATEMP"]:after {
+content: "Aktuell: ";
+}
+
+[lang="RU"] [data-content="ATEMP"]:after {
+content: "Текущая: ";
+}
+
+[lang="EN"] [data-content="ATEMP"]:after {
+content: "Current: ";
+}
+
+[lang="PL"] [data-content="PUMP_OFF"]:after {
+content: "Pompa wyłączona. Tryb termostatowania nie może zacząć pracy";
+}
+
+[lang="ES"] [data-content="PUMP_OFF"]:after {
+content: "Bomba apagada. El modo de termostato no puede iniciarse.";
+}
+
+[lang="DE"] [data-content="PUMP_OFF"]:after {
+content: "Pumpe ausgeschaltet. Thermostatmodus kann nicht gestartet werden.";
+}
+
+[lang="RU"] [data-content="PUMP_OFF"]:after {
+content: "Насос выключен. Режим термостатирования не может быть запущен.";
+}
+
+[lang="EN"] [data-content="PUMP_OFF"]:after {
+content: "Pump off. Thermostat mode cannot start.";
+}
+

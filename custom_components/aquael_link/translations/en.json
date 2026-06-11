@@ -1,0 +1,85 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add Aquael Link Device",
+        "description": "Select a discovered device from the list or add it manually by entering the IP address.",
+        "data": {
+          "device_choice": "Device",
+          "ip_address": "IP Address",
+          "device_name": "Device Name",
+          "add_to_panel": "Add to Aquael Link panel"
+        },
+        "data_description": {
+          "device_choice": "Select a discovered device or choose manual entry.",
+          "ip_address": "Required only when adding a device manually.",
+          "device_name": "Optional display name shown in Home Assistant.",
+          "add_to_panel": "With your consent, supported devices will be shown as tiles in the Aquael Link panel."
+        }
+      }
+    },
+    "error": {
+      "ip_required": "IP address is required when adding a device manually.",
+      "cannot_detect_device_type": "Cannot detect device type. Check the IP address and ensure the device is connected to the network.",
+      "cannot_connect": "Cannot connect to the device. Check the IP address and network.",
+      "unknown": "Unexpected error. Check Home Assistant logs."
+    },
+    "abort": {
+      "already_configured": "This device is already configured in Home Assistant."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "rssi": { "name": "Wi-Fi Signal" },
+      "ip_address": { "name": "IP Address" },
+      "mac": { "name": "MAC Address" },
+      "version": { "name": "Firmware Version" },
+      "water": { "name": "Water Temperature" },
+      "ambient": { "name": "Ambient Temperature" },
+      "sample_interval": { "name": "Sample Interval" },
+      "cal_water": { "name": "Calibration – Water" },
+      "cal_ambient": { "name": "Calibration – Ambient" },
+      "range_down": { "name": "Notification Lower Threshold" },
+      "range_up": { "name": "Notification Upper Threshold" },
+      "output_1_state": { "name": "Output 1 Raw State" },
+      "output_2_state": { "name": "Output 2 Raw State" },
+      "filter_current_temperature": { "name": "Filter Temperature" },
+      "filter_static_temperature": { "name": "Target Temperature" },
+      "filter_static_efficiency": { "name": "Filter Efficiency" },
+      "mode": { "name": "Operating Mode" },
+      "protocol": { "name": "Protocol" },
+      "water_sensor_flooded": { "name": "Flood Sensor" }
+    },
+    "switch": {
+      "output_1": { "name": "Output 1" },
+      "output_2": { "name": "Output 2" },
+      "alarms_enabled": { "name": "Automatic Mode" },
+      "pump_enabled": { "name": "Pump" },
+      "thermostat_enabled": { "name": "Thermostating" },
+      "notification_enabled": { "name": "Notifications" },
+      "add_to_panel": { "name": "Aquael Link Panel" }
+    },
+    "select": {
+      "output_1_mode_select": { "name": "Output 1 Mode" },
+      "output_2_mode_select": { "name": "Output 2 Mode" },
+      "notification_language": { "name": "Notification Language" },
+      "notification_unit": { "name": "Temperature Unit" }
+    },
+    "button": {
+      "identify": { "name": "Identify Device" },
+      "reset": { "name": "Reset Device" }
+    },
+    "number": {
+      "cal_water": { "name": "Calibration – Water" },
+      "cal_ambient": { "name": "Calibration – Ambient" },
+      "range_down": { "name": "Notification Lower Threshold" },
+      "range_up": { "name": "Notification Upper Threshold" },
+      "sample_interval": { "name": "Sample Interval" },
+      "filter_static_efficiency": { "name": "Filter Efficiency" },
+      "filter_static_temperature": { "name": "Target Temperature" }
+    },
+    "text": {
+      "device_name": { "name": "Device Name" }
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Dodaj urządzenie Aquael aqu@rium",
+        "description": "Wybierz wykryte urządzenie z listy lub dodaj je ręcznie podając adres IP.",
+        "data": {
+          "device_choice": "Urządzenie",
+          "ip_address": "Adres IP",
+          "device_name": "Nazwa urządzenia",
+          "add_to_panel": "Dodaj do panelu Aquael Link"
+        },
+        "data_description": {
+          "device_choice": "Wybierz wykryte urządzenie lub opcję ręcznego dodawania.",
+          "ip_address": "Wymagane tylko przy ręcznym dodawaniu urządzenia.",
+          "device_name": "Opcjonalna nazwa wyświetlana w Home Assistant.",
+          "add_to_panel": "Za Twoją zgodą obsługiwane urządzenie pojawi się jako kafelek w panelu Aquael Link."
+        }
+      }
+    },
+    "error": {
+      "ip_required": "Adres IP jest wymagany przy ręcznym dodawaniu urządzenia.",
+      "cannot_detect_device_type": "Nie można wykryć typu urządzenia. Sprawdź adres IP i czy urządzenie jest podłączone do sieci.",
+      "cannot_connect": "Brak połączenia z urządzeniem. Sprawdź adres IP i sieć.",
+      "unknown": "Nieoczekiwany błąd. Sprawdź logi Home Assistant."
+    },
+    "abort": {
+      "already_configured": "To urządzenie jest już skonfigurowane w Home Assistant."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "rssi": { "name": "Sygnał Wi-Fi" },
+      "ip_address": { "name": "Adres IP" },
+      "mac": { "name": "Adres MAC" },
+      "version": { "name": "Wersja oprogramowania" },
+      "water": { "name": "Temperatura wody" },
+      "ambient": { "name": "Temperatura otoczenia" },
+      "sample_interval": { "name": "Interwał odczytu" },
+      "cal_water": { "name": "Kalibracja – woda" },
+      "cal_ambient": { "name": "Kalibracja – otoczenie" },
+      "range_down": { "name": "Próg dolny powiadomień" },
+      "range_up": { "name": "Próg górny powiadomień" },
+      "output_1_state": { "name": "Stan surowy wyjścia 1" },
+      "output_2_state": { "name": "Stan surowy wyjścia 2" },
+      "filter_current_temperature": { "name": "Temperatura filtra" },
+      "filter_static_temperature": { "name": "Temperatura zadana" },
+      "filter_static_efficiency": { "name": "Wydajność filtra" },
+      "mode": { "name": "Tryb pracy" },
+      "protocol": { "name": "Protokół" },
+      "water_sensor_flooded": { "name": "Czujnik zalania" }
+    },
+    "switch": {
+      "output_1": { "name": "Wyjście 1" },
+      "output_2": { "name": "Wyjście 2" },
+      "alarms_enabled": { "name": "Tryb automatyczny" },
+      "pump_enabled": { "name": "Pompa" },
+      "thermostat_enabled": { "name": "Termostatowanie" },
+      "notification_enabled": { "name": "Powiadomienia" },
+      "add_to_panel": { "name": "Panel Aquael Link" }
+    },
+    "select": {
+      "output_1_mode_select": { "name": "Tryb wyjścia 1" },
+      "output_2_mode_select": { "name": "Tryb wyjścia 2" },
+      "notification_language": { "name": "Język powiadomień" },
+      "notification_unit": { "name": "Jednostka temperatury" }
+    },
+    "button": {
+      "identify": { "name": "Identyfikuj urządzenie" },
+      "reset": { "name": "Resetuj urządzenie" }
+    },
+    "number": {
+      "cal_water": { "name": "Kalibracja – woda" },
+      "cal_ambient": { "name": "Kalibracja – otoczenie" },
+      "range_down": { "name": "Próg dolny powiadomień" },
+      "range_up": { "name": "Próg górny powiadomień" },
+      "sample_interval": { "name": "Interwał odczytu" },
+      "filter_static_efficiency": { "name": "Wydajność filtra" },
+      "filter_static_temperature": { "name": "Temperatura zadana" }
+    },
+    "text": {
+      "device_name": { "name": "Nazwa urządzenia" }
+    }
+  }
+}

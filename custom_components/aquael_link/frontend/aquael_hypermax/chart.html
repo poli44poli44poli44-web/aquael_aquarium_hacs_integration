@@ -1,0 +1,1606 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Aquael aqu@rium</title>
+    <meta charset="UTF-8" name="viewport"
+          content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        .localized:after {
+            content: attr(data-content);
+        }
+
+        [lang="PL"] [data-content="Set range"]:after {
+            content: "Ustawiony zakres";
+        }
+
+        [lang="ES"] [data-content="Set range"]:after {
+            content: "Set range";
+        }
+
+        [lang="DE"] [data-content="Set range"]:after {
+            content: "Set range";
+        }
+
+        [lang="PL"] [data-content="NOTYFICATION SENTS"]:after {
+            content: "WYSŁANE POWIADOMIENIA";
+        }
+
+        [lang="ES"] [data-content="NOTYFICATION SENTS"]:after {
+            content: "NOTIFICACIÓN ENVIADA";
+        }
+
+        [lang="DE"] [data-content="NOTYFICATION SENTS"]:after {
+            content: "NOTYFICATION SENTS";
+        }
+
+        [lang="PL"] [data-content="RECENT RESULTS"]:after {
+            content: "OSTATNIE POMIARY";
+        }
+
+        [lang="ES"] [data-content="RECENT RESULTS"]:after {
+            content: "RESULTADOS RECIENTES";
+        }
+
+        [lang="DE"] [data-content="RECENT RESULTS"]:after {
+            content: "LETZTE ERGEBNISSE";
+        }
+
+        [lang="PL"] [data-content="RETURN"]:after {
+            content: "WRÓĆ";
+        }
+
+        [lang="ES"] [data-content="RETURN"]:after {
+            content: "REGRESO";
+        }
+
+        [lang="DE"] [data-content="RETURN"]:after {
+            content: "Rückkehr";
+        }
+
+        [lang="PL"] [data-content="RESET CHART"]:after {
+            content: "RESETUJ WYKRESY";
+        }
+
+        [lang="ES"] [data-content="RESET CHART"]:after {
+            content: "RESTABLECER TABLAS";
+        }
+
+        [lang="DE"] [data-content="RESET CHART"]:after {
+            content: "RESET CHARTS";
+        }
+
+        [lang="PL"] [data-content="LAST"]:after {
+            content: "OSTATNI";
+        }
+
+        [lang="ES"] [data-content="LAST"]:after {
+            content: "ÚLTIMO";
+        }
+
+        [lang="DE"] [data-content="LAST"]:after {
+            content: "ZULETZT";
+        }
+
+        [lang="PL"] [data-content="TIME"]:after {
+            content: "Czas";
+        }
+
+        [lang="ES"] [data-content="TIME"]:after {
+            content: "Hora";
+        }
+
+        [lang="DE"] [data-content="TIME"]:after {
+            content: "Zeit";
+        }
+
+        [lang="PL"] [data-content="TEMPERATURE OF WATER"]:after {
+            content: "Temperatura wody";
+        }
+
+        [lang="ES"] [data-content="TEMPERATURE OF WATER"]:after {
+            content: "Temperatura del agua";
+        }
+
+        [lang="DE"] [data-content="TEMPERATURE OF WATER"]:after {
+            content: "Temperatur des wassers";
+        }
+
+        [lang="PL"] [data-content="AMBIENT TEMPERATURE"]:after {
+            content: "pump speed";
+        }
+
+        [lang="ES"] [data-content="AMBIENT TEMPERATURE"]:after {
+            content: "pump speed";
+        }
+
+        [lang="DE"] [data-content="AMBIENT TEMPERATURE"]:after {
+            content: "pump speed";
+        }
+
+        .weather-wrapper {
+            zoom: .4;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center
+        }
+
+        .a {
+            margin: 20px 25px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            width: 270px;
+            height: 270px;
+            font-size: 50px;
+            background-color: rgba(19, 35, 47, 0.9);
+            box-shadow: 0 10px 30px 10px rgba(19, 35, 47, 0.3);
+            -webkit-animation: appear 500ms ease-out forwards;
+            animation: appear 500ms ease-out forwards
+        }
+
+        .a h1 {
+            position: absolute;
+            color: #b8b8b8;
+            left: 35px;
+            top: 22px;
+            font: 500 30px 'Lato', sans-serif
+        }
+
+        .a h2 {
+            position: absolute;
+            color: #b8b8b8;
+            bottom: 0;
+            left: 35px;
+            bottom: 35px;
+            opacity: 0;
+            -webkit-transform: translateX(150px);
+            transform: translateX(150px);
+            -webkit-animation: title-appear 500ms ease-out 500ms forwards;
+            animation: title-appear 500ms ease-out 500ms forwards;
+            font: 500 50px 'Lato', sans-serif
+        }
+
+        .a h3 {
+            position: absolute;
+            color: #b8b8b8;
+            right: 30px;
+            top: 10px;
+            font: 500 30px 'Lato', sans-serif
+        }
+
+        .a p {
+            position: absolute;
+            color: #d2d2d2;
+            bottom: 0;
+            left: 35px;
+            -webkit-animation: title-appear 1s ease-out 500ms forwards;
+            animation: title-appear 1s ease-out 500ms forwards;
+            font: 600 22px 'Lato', sans-serif
+        }
+
+        .weather-icon {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            top: 0;
+            float: right;
+            margin: 40px 40px 0 0;
+            -webkit-animation: weather-icon-move 5s ease-in-out infinite;
+            animation: weather-icon-move 5s ease-in-out infinite
+        }
+
+        .term {
+            width: 3px;
+            background: #f80000;
+            height: 50px;
+            position: relative;
+            border: 2px solid #f80000;
+            border-radius: 20px;
+            z-index: 1;
+            margin-bottom: 50px
+        }
+
+        .term:before,
+        .term:after {
+            position: absolute;
+            content: "";
+            border-radius: 50%
+        }
+
+        .term:after {
+            transform: translateX(-50%);
+            width: 18px;
+            height: 18px;
+            background-color: #f80000;
+            bottom: -15px;
+            left: 50%
+        }
+
+        @keyframes title-appear {
+            from {
+                opacity: 0;
+                -webkit-transform: translateX(150px);
+                transform: translateX(150px)
+            }
+
+            to {
+                opacity: 1;
+                -webkit-transform: translateX(0px);
+                transform: translateX(0px)
+            }
+        }
+
+        .form {
+            background: rgba(19, 35, 47, 0.9);
+            max-width: 60%;
+            margin: 20px auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3)
+        }
+
+        .button {
+            border: 0;
+            outline: 0;
+            border-radius: 0;
+            padding: 15px 0;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            background: #1ab188;
+            color: #fff;
+            transition: all .5s ease;
+            -webkit-appearance: none
+        }
+
+        .button-block {
+            display: block;
+            width: 100%
+        }
+
+            display: none;
+            text-align: center
+        }
+
+        canvas {
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none
+        }
+
+        .chart-container {
+            margin-left: 10px;
+            margin-right: 20px;
+            height: 300px
+        }
+
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+
+
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center
+        }
+
+            background-color: #f2f2f2
+        }
+
+            background-color: #ddd
+        }
+
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: center;
+            background-color: #1ab188;
+            color: #fff
+        }
+
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: center;
+            background-color: rgba(255, 102, 0, 0.8);
+            color: #fff
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: radial-gradient(#fdfbfb, #ebedee);
+        }
+
+        .dots {
+            width: 0;
+            height: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            margin: auto;
+            -webkit-filter: url(#goo);
+            filter: url(#goo)
+        }
+
+        .dot {
+            width: 0;
+            height: 0;
+            position: absolute;
+            left: 0;
+            top: 0
+        }
+
+        .dot:before {
+            content: '';
+            width: 35px;
+            height: 35px;
+            border-radius: 50px;
+            background: #fbd301;
+            position: absolute;
+            left: 50%;
+            -webkit-transform: translateY(0) rotate(0deg);
+            transform: translateY(0) rotate(0deg);
+            margin-left: -17.5px;
+            margin-top: -17.5px
+        }
+
+        @-webkit-keyframes dot-move {
+            0% {
+                -webkit-transform: translateY(0);
+                transform: translateY(0)
+            }
+
+            18%,
+            22% {
+                -webkit-transform: translateY(-70px);
+                transform: translateY(-70px)
+            }
+
+            40%,
+            100% {
+                -webkit-transform: translateY(0);
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes dot-move {
+            0% {
+                -webkit-transform: translateY(0);
+                transform: translateY(0)
+            }
+
+            18%,
+            22% {
+                -webkit-transform: translateY(-70px);
+                transform: translateY(-70px)
+            }
+
+            40%,
+            100% {
+                -webkit-transform: translateY(0);
+                transform: translateY(0)
+            }
+        }
+
+        @-webkit-keyframes dot-colors {
+            0% {
+                background-color: #fbd301
+            }
+
+            25% {
+                background-color: #ff3270
+            }
+
+            50% {
+                background-color: #208bf1
+            }
+
+            75% {
+                background-color: #afe102
+            }
+
+            100% {
+                background-color: #fbd301
+            }
+        }
+
+        @keyframes dot-colors {
+            0% {
+                background-color: #fbd301
+            }
+
+            25% {
+                background-color: #ff3270
+            }
+
+            50% {
+                background-color: #208bf1
+            }
+
+            75% {
+                background-color: #afe102
+            }
+
+            100% {
+                background-color: #fbd301
+            }
+        }
+
+        .dot:nth-child(5):before {
+            z-index: 100;
+            width: 45.5px;
+            height: 45.5px;
+            margin-left: -22.75px;
+            margin-top: -22.75px;
+            -webkit-animation: dot-colors 4s ease infinite;
+            animation: dot-colors 4s ease infinite
+        }
+
+        @-webkit-keyframes dot-rotate-1 {
+            0% {
+                -webkit-transform: rotate(-105deg);
+                transform: rotate(-105deg)
+            }
+
+            100% {
+                -webkit-transform: rotate(270deg);
+                transform: rotate(270deg)
+            }
+        }
+
+        @keyframes dot-rotate-1 {
+            0% {
+                -webkit-transform: rotate(-105deg);
+                transform: rotate(-105deg)
+            }
+
+            100% {
+                -webkit-transform: rotate(270deg);
+                transform: rotate(270deg)
+            }
+        }
+
+        .dot:nth-child(1) {
+            -webkit-animation: dot-rotate-1 4s 0 linear infinite;
+            animation: dot-rotate-1 4s 0 linear infinite
+        }
+
+        .dot:nth-child(1):before {
+            background-color: #ff3270;
+            -webkit-animation: dot-move 4s 0 ease infinite;
+            animation: dot-move 4s 0 ease infinite
+        }
+
+        @-webkit-keyframes dot-rotate-2 {
+            0% {
+                -webkit-transform: rotate(165deg);
+                transform: rotate(165deg)
+            }
+
+            100% {
+                -webkit-transform: rotate(540deg);
+                transform: rotate(540deg)
+            }
+        }
+
+        @keyframes dot-rotate-2 {
+            0% {
+                -webkit-transform: rotate(165deg);
+                transform: rotate(165deg)
+            }
+
+            100% {
+                -webkit-transform: rotate(540deg);
+                transform: rotate(540deg)
+            }
+        }
+
+        .dot:nth-child(2) {
+            -webkit-animation: dot-rotate-2 4s 1s linear infinite;
+            animation: dot-rotate-2 4s 1s linear infinite
+        }
+
+        .dot:nth-child(2):before {
+            background-color: #208bf1;
+            -webkit-animation: dot-move 4s 1s ease infinite;
+            animation: dot-move 4s 1s ease infinite
+        }
+
+        @-webkit-keyframes dot-rotate-3 {
+            0% {
+                -webkit-transform: rotate(435deg);
+                transform: rotate(435deg)
+            }
+
+            100% {
+                -webkit-transform: rotate(810deg);
+                transform: rotate(810deg)
+            }
+        }
+
+        @keyframes dot-rotate-3 {
+            0% {
+                -webkit-transform: rotate(435deg);
+                transform: rotate(435deg)
+            }
+
+            100% {
+                -webkit-transform: rotate(810deg);
+                transform: rotate(810deg)
+            }
+        }
+
+        .dot:nth-child(3) {
+            -webkit-animation: dot-rotate-3 4s 2s linear infinite;
+            animation: dot-rotate-3 4s 2s linear infinite
+        }
+
+        .dot:nth-child(3):before {
+            background-color: #afe102;
+            -webkit-animation: dot-move 4s 2s ease infinite;
+            animation: dot-move 4s 2s ease infinite
+        }
+
+        @-webkit-keyframes dot-rotate-4 {
+            0% {
+                -webkit-transform: rotate(705deg);
+                transform: rotate(705deg)
+            }
+
+            100% {
+                -webkit-transform: rotate(1080deg);
+                transform: rotate(1080deg)
+            }
+        }
+
+        @keyframes dot-rotate-4 {
+            0% {
+                -webkit-transform: rotate(705deg);
+                transform: rotate(705deg)
+            }
+
+            100% {
+                -webkit-transform: rotate(1080deg);
+                transform: rotate(1080deg)
+            }
+        }
+
+        .dot:nth-child(4) {
+            -webkit-animation: dot-rotate-4 4s 3s linear infinite;
+            animation: dot-rotate-4 4s 3s linear infinite
+        }
+
+        .dot:nth-child(4):before {
+            background-color: #fbd301;
+            -webkit-animation: dot-move 4s 3s ease infinite;
+            animation: dot-move 4s 3s ease infinite
+        }
+    </style>
+</head>
+
+<body onload=myFunction() style=margin:0>
+<div id="LangElement">
+    <div class=dots id=dots>
+        <div class=dot></div>
+        <div class=dot></div>
+        <div class=dot></div>
+        <div class=dot></div>
+        <div class=dot></div>
+        <br>
+        <br>
+        <br>
+        <br>
+    </div>
+    <br>
+    <br>
+
+
+    <div style=display:none id=card>
+        <div class="weather-wrapper">
+            <div class="a">
+                <div class="weather-icon"></div>
+                <h3>MIN</h3>
+                <h2 id=my2> - </h2>
+                <p id=myp2> - </p>
+            </div>
+            <div class="a">
+                <div class="weather-icon term"></div>
+                <h1><span class="localized" data-content="LAST"></span></h1>
+                <h2 id=my> - </h2>
+                <p id=myp> - </p>
+            </div>
+            <div class="a">
+                <div class="weather-icon"></div>
+                <h3>MAX</h3>
+                <h2 id=my3> - </h2>
+                <p id=myp3> - </p>
+            </div>
+        </div>
+    </div>
+    <div style=display:none id=butt>
+        <div class=form>
+            <button onclick=resetZoom() class="button button-block"><span class="localized"
+                                                                          data-content="RESET CHARTS"></span></button>
+        </div>
+    </div>
+
+    <div class=chart-container position: relative; height:350px; width:100%>
+        <canvas id=Chart width=300 height=300></canvas>
+    </div>
+    <br>
+    <br>
+    <div style=display:none id=buttS>
+        <div class=form>
+            <button onclick=resetZoom() class="button button-block"><span class="localized"
+                                                                          data-content="RESET CHARTS"></span></button>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class=chart-container position: relative; height:350px; width:100%>
+        <canvas id=Chart2 width=300 height=300></canvas>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+</div>
+
+<script>
+var DEVBASE=(function(){var p=new URLSearchParams(window.location.search);var ip=p.get("ip");return ip?("http://"+ip+"/"):"";})();
+var MAX_VALID_TIMESTAMP_MS = 2372506735000;
+document.getElementById("LangElement").lang="PL";
+</script>
+<script src="../aquael_thermometer/hammerjs.js"></script>
+<script src="../aquael_thermometer/moment-with-locales.min.js"></script>
+<script src="../aquael_thermometer/Chart.min.js"></script>
+<script src="../aquael_thermometer/chartjs-plugin-zoom.min.js"></script>
+<script src="../aquael_thermometer/chartjs-plugin-annotation.min.js"></script>
+<script src="../aquael_thermometer/chartjs-plugin-responsive-downsample.bundle.min.js"></script>
+<script src="../aquael_thermometer/jquery.min.js"></script>
+<script src="../aquael_thermometer/jquery.csv.min.js"></script>
+
+<script>
+        var ActualTemp = document.getElementById("my"),
+            ActualTempData = document.getElementById("myp"),
+            TempMAX = document.getElementById("my3"),
+            TempDataMAX = document.getElementById("myp3"),
+            TempMIN = document.getElementById("my2"),
+            TempDataMIN = document.getElementById("myp2"),
+            result, ADCvalues = [],
+            ADCvaluesAmbient = [],
+            timeStamp = [],
+            ADCvaluesMINC, ADCvaluesMINF, timeStampMIN, ADCvaluesMAXC, ADCvaluesMAXF, timeStampMAX, ADCvalues2 = [],
+            ADCvaluesAmbient2 = [],
+            ADCvaluesMINCAmbient, ADCvaluesMINFAmbient, timeStampMINAmbient, ADCvaluesMAXCAmbient, ADCvaluesMAXFAmbient, timeStampMAXAmbient, MAXY, MINY,
+            timeStamp2 = [],
+            selected = 1,
+            LabelStrnigX = "[\u00b0C]",
+            LabelBlock = "\u00b0C",
+            removeObject = 0,
+            myVar,
+            TimeString = "Time",
+            TempString = "Temperature of water",
+            Temp2String = "Pump speed",
+            LabelNotification = "Notification",
+            NotifiEnable = 0,
+            NotifiRangeUp = 0,
+            NotifiRangeDown = 0,
+            NotifiTable = [],
+            NotifiTemp = [],
+            NotifiAmbientTemp = [],
+            FirmwareLnag = 'EN',
+            dissableFlag = false,
+            data = [],
+            FirstData = true,
+            ADCvaluesData, ADCvaluesAmbientData, LoadFullPage = false,
+            nameFlagA = false,
+            nameFlagB = false,
+            nameFlagC = false,
+            nameFlagD = false,
+            Sys = 'F',
+            Sys2 = Sys;
+
+        function myFunction() {
+            if (Sys === 'I') {
+                Switchlang(device.getDeviceLang());
+                "0" === device.getDeviceUnit() ? (selected = 1, LabelStrnigX = "[\u00b0C]", LabelBlock = "\u00b0C") : (selected = 0, LabelStrnigX = "[\u00b0F]", LabelBlock = "\u00b0F");
+
+                if (device.iPADorMAC() == true) {
+                    var myStyle = document.createElement('style');
+                    myStyle.innerHTML = '.a h3 { font: 500 14px "Lato", sans-serif;} .a h2 { font: 500 25px "Lato", sans-serif;bottom: 70px;} .a p {font: 650 10px "Lato", sans-serif;}';
+                    document.head.appendChild(myStyle);
+                }
+
+            }
+            if (Sys === 'F' || Sys === 'T') {
+                document.getElementById("LangElement").lang = 'ENG';
+                LabelStrnigX = 1 == selected ? "[\u00b0C]" : "[\u00b0F]";
+                LabelBlock = 1 == selected ? "\u00b0C" : "\u00b0F";
+                getData2();
+
+            }
+
+            CSVread();
+            LoadFullPage = true;
+
+        }
+
+        function Switchlang(b) {
+            console.log('lang switched: ' + b);
+            switch (b) {
+                case 'PL':
+                    TimeString = "Czas";
+                    TempString = "Temperatura wody";
+                    Temp2String = "Prędkość pompy ";
+                    LabelNotification = "Powiadomienia";
+                    break;
+                case 'ES':
+                    TimeString = "Hora";
+                    TempString = "Temperatura del agua";
+                    Temp2String = "Pump speed";
+                    LabelNotification = "Notificación";
+                    break;
+                case 'DE':
+                    TimeString = "Zeit";
+                    TempString = "Temperatur des wassers";
+                    Temp2String = "Pump speed";
+                    LabelNotification = "Benachrichtigung";
+                    break;
+                default:
+                    TimeString = "Time";
+                    TempString = "Temperature of water";
+                    Temp2String = "Pump speed";
+                    LabelNotification = "Notification";
+            }
+            if (Sys === 'A') {
+            }
+            document.getElementById("LangElement").lang = b;
+        }
+
+        function loadMsg(a, b) {
+            console.log("loadMsg for sys: " + Sys);
+            "0" == a ? (selected = 1, LabelStrnigX = "[\u00b0C]", LabelBlock = "\u00b0C") : (selected = 0, LabelStrnigX = "[\u00b0F]", LabelBlock = "\u00b0F");
+            console.log("language = " + b);
+            Switchlang(b);
+
+            console.log("gset NAMEs2");
+            console.log(device.NameOUT());
+            console.log(device.NameIN());
+
+        };
+
+        function showPage() {
+            showElement("dots", "none");
+            showElement("card", "block");
+            showElement("butt", "block");
+            showElement("buttS", "block");
+        }
+
+        function showElement(id, display) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.style.display = display;
+            }
+        }
+        var generateData1 = function (count) {
+            var data = [];
+            for (var i = 0; i < count; i++) {
+                data.push({
+                    x: timeStamp[i],
+                    y: ADCvalues[i],
+                });
+            }
+            return data;
+        };
+        var generateData2 = function (count) {
+            var data = [];
+            for (var i = 0; i < count; i++) {
+                data.push({
+                    x: timeStamp[i],
+                    y: ADCvaluesAmbient[i],
+                });
+            }
+            return data;
+        };
+
+        var generateData3 = function () {
+            var data = [];
+            data.push({
+                x: timeStamp[0],
+                y: ADCvaluesAmbient[0],
+            });
+            return data;
+        };
+
+        var generateDataset1 = function (name, dataCount) {
+            ADCvaluesData = generateData1(dataCount);
+            return {
+                label: name,
+                data: ADCvaluesData,
+                pointRadius: 0,
+                lineTension: 0,
+                backgroundColor: "rgba( 211, 63, 63, 0.06)",
+                borderColor: "rgba( 211, 63, 63, 1)",
+                fill: true,
+            };
+
+        };
+        var generateDataset2 = function (name, dataCount) {
+            ADCvaluesAmbientData = generateData2(dataCount);
+            return {
+                label: name,
+                data: ADCvaluesAmbientData,
+                pointRadius: 0,
+                lineTension: 0,
+                backgroundColor: "rgba( 63, 137, 211, 0.06)",
+                borderColor: "rgba( 63, 137, 211, 1)",
+                fill: true,
+            };
+        };
+
+        function showGraph() {
+            var b = document.getElementById("Chart").getContext("2d");
+            window.myLine = new window.Chart(b, {
+                type: 'line',
+                data: {
+                    datasets: [generateDataset1(TempString, ADCvalues.length)],
+                    borderColor: "rgba( 211, 63, 63, 1)",
+                    fill: true,
+                },
+                options: {
+                    title: {
+                        display: false
+                    },
+                    animations: {
+                        radius: {
+                            duration: 400,
+                            easing: 'linear',
+                            loop: (context) => context.active
+                        }
+                    },
+                    hoverRadius: 12,
+                    hoverBackgroundColor: 'yellow',
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false,
+                        axis: 'x'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        responsive: false,
+                        maintainAspectRatio: false,
+                        onClick: function (event, legendItem) {
+                        },
+
+                    },
+                    tooltips: {
+                        enabled: false,
+                        position: "nearest",
+                        mode: "index",
+                        intersect: !1,
+
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                return data.datasets[tooltipItem.datasetIndex].label + ': ' + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y + (1 == selected ? "\u00b0C" : "\u00b0F");
+                            },
+                        }
+                    },
+                    maintainAspectRatio: !1,
+                    elements: {
+                        line: {
+                            tension: 0.5
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                maxRotatuon: 0
+                            },
+                            type: 'time',
+                            time: {
+                                parser: 'DD/MM/YYYY HH:mm',
+                                tooltipFormat: 'DD/MM/YYYY HH:mm',
+                                displayFormats: {
+                                    millisecond: 'HH:mm:ss',
+                                    second: 'HH:mm:ss',
+                                    minute: 'HH:mm',
+                                    hour: 'DD/MM HH:mm',
+                                    day: 'DD/MM',
+                                    week: 'DD/MM',
+                                    month: 'DD/MM',
+                                    quarter: 'DD/MM/YYYY',
+                                    year: 'DD/MM/YYYY'
+                                },
+                            },
+                            scaleLabel: {
+                                display: !0,
+                                labelString: TimeString
+                            }
+                        }],
+                        yAxes: [{
+                            gridLines: {
+                                color: function (context) {
+                                    if (context.tick.value = 23.3) {
+                                        return "rgba( 211, 63, 63, 1)";
+                                    }
+                                },
+                            },
+                            scaleLabel: {
+                                display: !0,
+                                labelString: (LabelStrnigX)
+                            },
+                        }]
+                    },
+                    responsiveDownsample: {
+                        enabled: true,
+                        desiredDataPointDistance: 3
+                    },
+                    plugins: {
+                        zoom: {
+                            pan: {
+                                enabled: !0,
+                                mode: "x"
+                            },
+                            zoom: {
+                                enabled: !0,
+                                drag: false,
+                                mode: "x",
+                                speed: 0.05,
+                            }
+                        }
+                    },
+                    annotation: {
+                        annotations: [{}]
+                    }
+                }
+            });
+
+            var b = document.getElementById("Chart2").getContext("2d");
+            window.myLine = new window.Chart(b, {
+                type: 'line',
+                data: {
+                    datasets: [generateDataset2(Temp2String, ADCvaluesAmbient.length)],
+                    borderColor: "rgba( 211, 63, 63, 1)",
+                },
+                options: {
+                    title: {
+                        display: false
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        responsive: false,
+                        maintainAspectRatio: false,
+                        onClick: function (event, legendItem) {
+                        },
+
+                    },
+                    tooltips: {
+                        enabled: false,
+                        position: "nearest",
+                        mode: "index",
+                        intersect: !1,
+
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                return data.datasets[tooltipItem.datasetIndex].label + ': ' + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y + (1 == selected ? "\u00b0C" : "\u00b0F");
+                            },
+                        }
+                    },
+                    maintainAspectRatio: !1,
+                    elements: {
+                        line: {
+                            tension: 0.5
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                maxRotatuon: 0
+                            },
+                            type: 'time',
+                            time: {
+                                parser: 'DD/MM/YYYY HH:mm',
+                                tooltipFormat: 'DD/MM/YYYY HH:mm',
+                                displayFormats: {
+                                    millisecond: 'HH:mm:ss',
+                                    second: 'HH:mm:ss',
+                                    minute: 'HH:mm',
+                                    hour: 'DD/MM HH:mm',
+                                    day: 'DD/MM',
+                                    week: 'DD/MM',
+                                    month: 'DD/MM',
+                                    quarter: 'DD/MM/YYYY',
+                                    year: 'DD/MM/YYYY'
+                                },
+                            },
+                            scaleLabel: {
+                                display: !0,
+                                labelString: TimeString
+                            }
+                        }],
+                        yAxes: [{
+                            scaleLabel: {
+                                display: !0,
+                                labelString: 'RPM'
+                            },
+                        }]
+                    },
+                    responsiveDownsample: {
+                        enabled: true,
+                        desiredDataPointDistance: 3
+                    },
+                    plugins: {
+                        zoom: {
+                            pan: {
+                                enabled: !0,
+                                mode: "x"
+                            },
+                            zoom: {
+                                enabled: !0,
+                                drag: false,
+                                mode: "x",
+                                speed: 0.05,
+                            }
+                        }
+                    },
+                    annotation: {
+                        annotations: [{}]
+                    }
+                }
+            });
+
+        }
+        window.resetZoom = function () {
+            window.myLine.destroy();
+            showGraph();
+            window.myLine.update();
+        };
+
+        function RangeString(a, p) {
+            var v1 = 1 == selected ? Math.decimal(NotifiTemp[a], 1) : celToFah(Math.decimal(NotifiTemp[a], 1));
+            var v2 = 1 == selected ? Math.decimal(NotifiRangeDown[a], 1) : celToFah(Math.decimal(NotifiRangeDown[a], 1));
+            var v3 = 1 == selected ? Math.decimal(NotifiRangeUp[a], 1) : celToFah(Math.decimal(NotifiRangeUp[a], 1));
+            if (p == true) {
+                return v1 + " (" + v2 + "-" + v3 + ")"
+            } else {
+                return v2 + "-" + v3
+            }
+        }
+
+
+        function readDataFromCsv(a) {
+            ADCvalues = [];
+            timeStamp = [];
+            ADCvaluesAmbient = [];
+
+            if ((Sys === 'I') && (device.InternetConnection() == true)) {
+                if (Sys2 === 'I') {
+                    var MyData = device.getDeviceData();
+                } else {
+                    var MyData = JSON.parse(device.getDeviceData());
+                }
+                console.log("data keys num: " + Object.keys(MyData).length + " obj: " + JSON.stringify(MyData, null, 2));
+
+                for (var d = 0; d < MyData['Time'].length; d++) {
+                    timeStamp.push(1000 * MyData['Time'][d])
+
+                    if (1 == selected) {
+                        ADCvalues.push(MyData['Data'][d])
+                    } else {
+                        result = celToFah(parseFloat(MyData['Data'][d]));
+                        ADCvalues.push(result);
+
+                    }
+
+                    ADCvaluesAmbient.push(MyData['Data2'][d])
+
+                }
+            } else {
+                console.log("device.InternetConnection() = false");
+                timeStamp2 = a.map(function (b, c) {
+                    for (var d = 0; d < a.length; d++) {
+                        return timeStamp.push(1000 * b.Time), 1000 * +b.Time
+                    }
+                });
+
+                ADCvalues2 = a.map(function (b, c) {
+                    for (var d = 0; d < a.length; d++) {
+                        if (1 == selected) {
+                            return ADCvalues.push(b.Data), +b.Data
+                        }
+                        result = celToFah(parseFloat(b.Data));
+                        ADCvalues.push(result);
+                        return +result
+                    }
+                });
+
+                ADCvaluesAmbient2 = a.map(function (b, c) {
+                    for (var d = 0; d < a.length; d++) {
+                        if (1 == selected) {
+                            return ADCvaluesAmbient.push(b.Data2), +b.Data2
+                        }
+                        result = celToFah(parseFloat(b.Data2));
+                        ADCvaluesAmbient.push(result);
+                        return +result
+                    }
+                });
+            }
+
+            var newArr = timeStamp.reduce(function (acc, curr, index) {
+                if ((curr > MAX_VALID_TIMESTAMP_MS) || (curr < 1551593489000)) {
+                    acc.push(index);
+                }
+                if (isNaN(curr) == true) {
+                    acc.push(index);
+                }
+                if (curr == '') {
+                    acc.push(index);
+                }
+                if (curr == null) {
+                    acc.push(index);
+                }
+                return acc;
+            }, []);
+            for (var z = 0; z < newArr.length; z++) {
+                timeStamp.splice(newArr[z] - z, 1);
+                ADCvalues.splice(newArr[z] - z, 1);
+                ADCvaluesAmbient.splice(newArr[z] - z, 1);
+            }
+
+            var newArr3 = ADCvaluesAmbient.reduce(function (acc, curr, index) {
+                if (isNaN(curr) == true) {
+                    acc.push(index);
+                }
+                if (curr == '') {
+                    acc.push(index);
+                }
+                if (curr == null) {
+                    acc.push(index);
+                }
+                return acc;
+            }, []);
+
+            for (var z = 0; z < newArr3.length; z++) {
+                timeStamp.splice(newArr3[z] - z, 1);
+                ADCvalues.splice(newArr3[z] - z, 1);
+                ADCvaluesAmbient.splice(newArr3[z] - z, 1);
+            }
+
+            var newArr4 = ADCvalues.reduce(function (acc, curr, index) {
+                if (isNaN(curr) == true) {
+                    acc.push(index);
+                }
+                if (curr == '') {
+                    acc.push(index);
+                }
+                if (curr == null) {
+                    acc.push(index);
+                }
+                return acc;
+            }, []);
+
+            for (var z = 0; z < newArr4.length; z++) {
+                timeStamp.splice(newArr4[z] - z, 1);
+                ADCvalues.splice(newArr4[z] - z, 1);
+                ADCvaluesAmbient.splice(newArr4[z] - z, 1);
+            }
+
+            var Timestamp = 0;
+            var newArr2 = timeStamp.reduce(function (acc, curr, index) {
+                if (curr < Timestamp) {
+                    acc.push(index);
+                } else {
+                    Timestamp = curr;
+                }
+                return acc;
+            }, []);
+
+            for (var z = 0; z < newArr2.length; z++) {
+                timeStamp.splice(newArr2[z] - z, 1);
+                ADCvalues.splice(newArr2[z] - z, 1);
+                ADCvaluesAmbient.splice(newArr2[z] - z, 1);
+            }
+            check_min_max();
+            insert_Row_from_csv();
+
+            console.log("Samples count: " + ADCvalues.length);
+            console.log("1: " + newArr);
+            console.log("2: " + newArr2);
+            console.log("3: " + newArr3);
+            console.log("4: " + newArr4);
+
+            showGraph();
+            window.myLine.update();
+
+            setTimeout(function () {
+                getData()
+            }, 500)
+
+            setTimeout(function () {
+                getName()
+            }, 100)
+
+        }
+
+        function readDataFromCsvNotifi(a) {
+            NotifiTable = [];
+            NotifiTemp = [];
+            NotifiAmbientTemp = [];
+            NotifiRangeDown = [];
+            NotifiRangeUp = [];
+
+            if ((Sys === 'I') && (device.InternetConnection() == true)) {
+                console.log("Notifi device.InternetConnection():" + device.InternetConnection());
+                if (Sys2 === 'I') {
+                    var MyData = device.getDeviceDataNotifi();
+                } else {
+                    var MyData = JSON.parse(device.getDeviceDataNotifi());
+                }
+                for (var d = 0; d < MyData['Time'].length; d++) {
+                    NotifiTemp.push(MyData['TempOfWater'][d]);
+                    NotifiAmbientTemp.push(MyData['TempAmbient'][d]);
+                    NotifiRangeDown.push(MyData['RangeDown'][d]);
+                    NotifiRangeUp.push(MyData['RangeUp'][d]);
+                    NotifiTable.push(1000 * MyData['Time'][d])
+                }
+            } else {
+                NotifiTable = a.map(function (b, c) {
+                    for (var d = 0; d < a.length; d++) {
+                        NotifiTemp.push(b.TempOfWater);
+                        NotifiAmbientTemp.push(b.TempAmbient);
+                        NotifiRangeDown.push(b.RangeDown);
+                        NotifiRangeUp.push(b.RangeUp);
+                        return NotifiTable.push(1000 * b.Time), 1000 * +b.Time
+                    }
+                });
+            }
+
+            var newArr = NotifiTable.reduce(function (acc, curr, index) {
+                if ((curr > MAX_VALID_TIMESTAMP_MS) || (curr < 1551593489000)) {
+                    acc.push(index);
+                }
+                if (isNaN(curr) == true) {
+                    acc.push(index);
+                }
+                if (curr == '') {
+                    acc.push(index);
+                }
+                if (curr == null) {
+                    acc.push(index);
+                }
+                return acc;
+            }, []);
+            for (var z = 0; z < newArr.length; z++) {
+                NotifiTable.splice(newArr[z] - z, 1);
+                NotifiTemp.splice(newArr[z] - z, 1);
+                NotifiAmbientTemp.splice(newArr[z] - z, 1);
+                NotifiRangeDown.splice(newArr[z] - z, 1);
+                NotifiRangeUp.splice(newArr[z] - z, 1);
+            }
+
+            var newArr3 = NotifiTemp.reduce(function (acc, curr, index) {
+                if (isNaN(curr) == true) {
+                    acc.push(index);
+                }
+                if (curr == '') {
+                    acc.push(index);
+                }
+                if (curr == null) {
+                    acc.push(index);
+                }
+                return acc;
+            }, []);
+
+            for (var z = 0; z < newArr3.length; z++) {
+                NotifiTable.splice(newArr3[z] - z, 1);
+                NotifiTemp.splice(newArr3[z] - z, 1);
+                NotifiAmbientTemp.splice(newArr3[z] - z, 1);
+                NotifiRangeDown.splice(newArr3[z] - z, 1);
+                NotifiRangeUp.splice(newArr3[z] - z, 1);
+            }
+
+            var newArr4 = NotifiAmbientTemp.reduce(function (acc, curr, index) {
+                if (isNaN(curr) == true) {
+                    acc.push(index);
+                }
+                if (curr == '') {
+                    acc.push(index);
+                }
+                if (curr == null) {
+                    acc.push(index);
+                }
+                return acc;
+            }, []);
+
+            for (var z = 0; z < newArr4.length; z++) {
+                NotifiTable.splice(newArr4[z] - z, 1);
+                NotifiTemp.splice(newArr4[z] - z, 1);
+                NotifiAmbientTemp.splice(newArr4[z] - z, 1);
+                NotifiRangeDown.splice(newArr4[z] - z, 1);
+                NotifiRangeUp.splice(newArr4[z] - z, 1);
+            }
+            var newArr5 = NotifiRangeDown.reduce(function (acc, curr, index) {
+                if (isNaN(curr) == true) {
+                    acc.push(index);
+                }
+                if (curr == '') {
+                    acc.push(index);
+                }
+                if (curr == null) {
+                    acc.push(index);
+                }
+                return acc;
+            }, []);
+
+            for (var z = 0; z < newArr5.length; z++) {
+                NotifiTable.splice(newArr5[z] - z, 1);
+                NotifiTemp.splice(newArr5[z] - z, 1);
+                NotifiAmbientTemp.splice(newArr5[z] - z, 1);
+                NotifiRangeDown.splice(newArr5[z] - z, 1);
+                NotifiRangeUp.splice(newArr5[z] - z, 1);
+            }
+
+            var newArr6 = NotifiRangeUp.reduce(function (acc, curr, index) {
+                if (isNaN(curr) == true) {
+                    acc.push(index);
+                }
+                if (curr == '') {
+                    acc.push(index);
+                }
+                if (curr == null) {
+                    acc.push(index);
+                }
+                return acc;
+            }, []);
+
+            for (var z = 0; z < newArr6.length; z++) {
+                NotifiTable.splice(newArr6[z] - z, 1);
+                NotifiTemp.splice(newArr6[z] - z, 1);
+                NotifiAmbientTemp.splice(newArr6[z] - z, 1);
+                NotifiRangeDown.splice(newArr6[z] - z, 1);
+                NotifiRangeUp.splice(newArr6[z] - z, 1);
+            }
+
+            console.log("Notifi Samples count: " + NotifiTable.length);
+            console.log("1: " + newArr);
+            console.log("3: " + newArr3);
+            console.log("4: " + newArr4);
+            console.log("5: " + newArr5);
+            console.log("6: " + newArr6);
+
+        }
+
+        function check_min_max() {
+            if (!timeStamp.length) {
+                TempMAX.textContent = "-";
+                TempMIN.textContent = "-";
+                ActualTemp.textContent = "-";
+                TempDataMAX.textContent = "-";
+                TempDataMIN.textContent = "-";
+                ActualTempData.textContent = "-";
+                MINY = 0;
+                MAXY = 1;
+                return;
+            }
+            ADCvaluesMINC = Infinity;
+            ADCvaluesMAXC = -Infinity;
+            ADCvaluesMINF = Infinity;
+            ADCvaluesMAXF = -Infinity;
+            for (var a = 0; a < timeStamp.length; a++) {
+                dtaR = parseFloat(ADCvalues[a]);
+                if (!isNaN(dtaR)) {
+                    if (1 == selected) {
+                        if (dtaR > ADCvaluesMAXC) { ADCvaluesMAXC = dtaR; timeStampMAX = timeStamp[a]; }
+                        if (dtaR < ADCvaluesMINC) { ADCvaluesMINC = dtaR; timeStampMIN = timeStamp[a]; }
+                    } else {
+                        if (dtaR > ADCvaluesMAXF) { ADCvaluesMAXF = dtaR; timeStampMAX = timeStamp[a]; }
+                        if (dtaR < ADCvaluesMINF) { ADCvaluesMINF = dtaR; timeStampMIN = timeStamp[a]; }
+                    }
+                }
+            }
+            1 == selected ? (TempMAX.textContent = ADCvaluesMAXC + LabelBlock, TempMIN.textContent = ADCvaluesMINC + LabelBlock) : (TempMAX.textContent = ADCvaluesMAXF + LabelBlock, TempMIN.textContent = ADCvaluesMINF + LabelBlock);
+            TempDataMAX.textContent = (new Date(parseInt(timeStampMAX))).toLocaleString();
+            TempDataMIN.textContent = (new Date(parseInt(timeStampMIN))).toLocaleString();
+            ActualTemp.textContent = parseFloat(ADCvalues[timeStamp.length - 1]) + LabelBlock;
+            ActualTempData.textContent = (new Date(parseInt(timeStamp[timeStamp.length - 1]))).toLocaleString()
+
+            ADCvaluesMINCAmbient = Infinity;
+            ADCvaluesMAXCAmbient = -Infinity;
+            ADCvaluesMINFAmbient = Infinity;
+            ADCvaluesMAXFAmbient = -Infinity;
+            for (var a = 0; a < timeStamp.length; a++) {
+                dtaR = parseFloat(ADCvaluesAmbient[a]);
+                if (!isNaN(dtaR)) {
+                    if (1 == selected) {
+                        if (dtaR > ADCvaluesMAXCAmbient) { ADCvaluesMAXCAmbient = dtaR; timeStampMAXAmbient = timeStamp[a]; }
+                        if (dtaR < ADCvaluesMINCAmbient) { ADCvaluesMINCAmbient = dtaR; timeStampMINAmbient = timeStamp[a]; }
+                    } else {
+                        if (dtaR > ADCvaluesMAXFAmbient) { ADCvaluesMAXFAmbient = dtaR; timeStampMAXAmbient = timeStamp[a]; }
+                        if (dtaR < ADCvaluesMINFAmbient) { ADCvaluesMINFAmbient = dtaR; timeStampMINAmbient = timeStamp[a]; }
+                    }
+                }
+            }
+
+            ADCvaluesMINC > ADCvaluesMINCAmbient ? MINY = ADCvaluesMINCAmbient : MINY = ADCvaluesMINC;
+            ADCvaluesMAXC > ADCvaluesMAXCAmbient ? MAXY = ADCvaluesMAXC : MAXY = ADCvaluesMAXCAmbient;
+        }
+
+        function insert_Row_from_csv() {
+            showPage();
+        }
+
+        function celToFah(a) {
+            return Math.decimal(9 * a / 5 + 32, 1)
+        }
+        Math.decimal = function (b, c) {
+            var a = Math.pow(10, c + 1);
+            b = Math.round(Math.round(b * a) / 10);
+            return b / (a / 10)
+        };
+
+        function getData2() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (4 == this.readyState && 404 == this.status) {
+                    document.getElementById("LangElement").lang = 'ENG';
+                }
+
+                if (this.readyState == 4 && this.status == 200) {
+                    var d = JSON.parse(this.responseText);
+                    switch (d.UNIT) {
+                        case '0':
+                            selected = 0;
+                            LabelStrnigX = "[\u00b0F]";
+                            LabelBlock = "\u00b0F";
+                            console.log("UNIT= " + LabelBlock);
+                            break;
+                        case '1':
+                            selected = 1;
+                            LabelStrnigX = "[\u00b0C]";
+                            LabelBlock = "\u00b0C";
+                            console.log("UNIT= " + LabelBlock);
+                            break;
+                    }
+                    switch (d.LANG) {
+                        case '1':
+                            document.getElementById("LangElement").lang = 'PL';
+                            Switchlang('PL');
+
+                            break;
+                        case '2':
+                            document.getElementById("LangElement").lang = 'ENG';
+                            Switchlang('ENG');
+                            break;
+                        case '3':
+                            document.getElementById("LangElement").lang = 'DE';
+                            Switchlang('DE');
+                            break;
+                        case '4':
+                            document.getElementById("LangElement").lang = 'ES';
+                            Switchlang('ES');
+                            break;
+                        case '5':
+                            document.getElementById("LangElement").lang = 'PL';
+                            Switchlang('PL');
+                            break;
+                        case '6':
+                            document.getElementById("LangElement").lang = 'ENG';
+                            Switchlang('ENG');
+                            break;
+                        case '7':
+                            document.getElementById("LangElement").lang = 'DE';
+                            Switchlang('DE');
+                            break;
+                        case '8':
+                            document.getElementById("LangElement").lang = 'ES';
+                            Switchlang('ES');
+                            break;
+                    }
+                }
+            };
+            if (Sys === 'F') {
+                COMMAND = DEVBASE+"readDATA";
+            }
+            if (Sys === 'T') {
+                COMMAND = "http://10.0.0.3/readDATA";
+            }
+            xhttp.open("GET", COMMAND, !0);
+            xhttp.send();
+        }
+        function CSVread() {
+            if ((Sys === 'A') && (device.InternetConnection() == true)) {
+                Switchlang(device.getDeviceLang());
+                "0" === device.getDeviceUnit() ? (selected = 1, LabelStrnigX = "[\u00b0C]", LabelBlock = "\u00b0C") : (selected = 0, LabelStrnigX = "[\u00b0F]", LabelBlock = "\u00b0F");
+
+                console.log("Android device unit: " + device.getDeviceUnit());
+
+                Sys = 'I';
+                console.log("SYS  'A'->'I'")
+            }
+
+            var COMMAND;
+
+            if ((Sys === 'I') && (device.InternetConnection() == false)) {
+                COMMAND = "http://" + device.getDeviceIp() + "/all.csv";
+            }
+            if (Sys === 'A') {
+                COMMAND = device.getDeviceIp() + "/all.csv";
+            }
+            if (Sys === 'F') {
+                COMMAND = DEVBASE+"all.csv";
+            }
+            if (Sys === 'T') {
+                COMMAND = "http://10.0.0.3/all.csv";
+            }
+
+            if ((Sys === 'I') && (device.InternetConnection() == true)) {
+                readDataFromCsv()
+            } else {
+                $.get(COMMAND, function (csv_in) {
+                    var a = $.csv.toObjects(csv_in);
+                    readDataFromCsv(a)
+                })
+            }
+
+            if ((Sys === 'I') && (device.InternetConnection() == false)) {
+                COMMAND = "http://" + device.getDeviceIp() + "/notifi.csv";
+            }
+            if (Sys === 'A') {
+                COMMAND = device.getDeviceIp() + "/notifi.csv";
+
+            }
+            if (Sys === 'F') {
+                COMMAND = DEVBASE+"notifi.csv";
+            }
+            if (Sys === 'T') {
+                COMMAND = "http://192.168.5.148/notifi.csv";
+            }
+
+            if ((Sys === 'I') && (device.InternetConnection() == true)) {
+                console.log("readDataFromCsv()");
+                readDataFromCsvNotifi()
+            } else {
+                $.get(COMMAND, function (csv_in) {
+                    var a = $.csv.toObjects(csv_in);
+                    readDataFromCsvNotifi(a)
+                })
+            }
+        }
+
+        function getName() {
+            console.log("getName");
+            var elementExists = document.getElementById("dataSpanOUT2");
+            if (elementExists != null) { document.getElementById("dataSpanOUT2").setAttribute('data-content', TempString); nameFlagA = true; }
+            elementExists = document.getElementById("dataSpanIN2");
+            if (elementExists != null) { document.getElementById("dataSpanIN2").setAttribute('data-content', Temp2String); nameFlagB = true; }
+            elementExists = document.getElementById("dataSpanOUT1");
+            if (elementExists != null) { document.getElementById("dataSpanOUT1").setAttribute('data-content', TempString); nameFlagC = true; }
+            elementExists = document.getElementById("dataSpanIN1");
+            if (elementExists != null) { document.getElementById("dataSpanIN1").setAttribute('data-content', Temp2String); nameFlagD = true; }
+            if ((nameFlagA == false) || (nameFlagB == false) || (nameFlagC == false) || (nameFlagD == false)) {
+                setTimeout(function () {
+                    getName()
+                }, 2000)
+            }
+        }
+
+        function getData() {
+
+        };
+    </script>
+</body>
+
+</html>
