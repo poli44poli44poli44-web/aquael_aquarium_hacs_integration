@@ -1,5 +1,5 @@
 const PANEL_STATIC_URL = "/aquael_link_panel";
-const PANEL_VERSION = "0.17";
+const PANEL_VERSION = "0.19";
 
 class AquaelLinkPanel extends HTMLElement {
   constructor() {
@@ -633,7 +633,9 @@ class AquaelLinkPanel extends HTMLElement {
       return this._renderHypermax(this._selected);
     }
     if (this._selected.chart_url) {
-      return `<iframe title="${this._escape(this._selected.name)}" src="${this._escape(this._selected.chart_url)}"></iframe>`;
+      const token = (this._hass && this._hass.auth && this._hass.auth.data && this._hass.auth.data.access_token) || "";
+      const url = `${this._selected.chart_url}#${new URLSearchParams({ token }).toString()}`;
+      return `<iframe title="${this._escape(this._selected.name)}" src="${this._escape(url)}"></iframe>`;
     }
     return `<div class="empty">Brak widoku panelu dla tego urządzenia.</div>`;
   }

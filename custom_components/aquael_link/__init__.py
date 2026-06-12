@@ -3,10 +3,12 @@ import threading
 from pathlib import Path
 
 import voluptuous as vol
+from aiohttp import ClientError, ClientTimeout, web
 from homeassistant.components import panel_custom, websocket_api
-from homeassistant.components.http import StaticPathConfig
+from homeassistant.components.http import HomeAssistantView, StaticPathConfig
 from homeassistant.const import CONF_IP_ADDRESS, Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers import entity_registry as er
 
 from .const import CONF_ADD_TO_PANEL, CONF_DEVICE_TYPE, DOMAIN, TYPE_HYPERMAX, TYPE_THERMOMETER
@@ -38,6 +40,7 @@ def _domain_data(hass):
             "lock": threading.Lock(),
             "ws_registered": False,
             "panel_registered": False,
+            "proxy_registered": False,
         },
     )
 
@@ -45,6 +48,7 @@ def _domain_data(hass):
 async def async_setup_entry(hass: HomeAssistant, entry):
     data = _domain_data(hass)
     _async_register_websocket(hass, data)
+    _async_register_thermometer_proxy(hass, data)
 
     coordinator = AquaelLinkCoordinator(hass, entry, data["lock"])
     data["coordinators"][entry.entry_id] = coordinator
@@ -73,6 +77,45 @@ def _async_register_websocket(hass: HomeAssistant, data: dict):
     data["ws_registered"] = True
 
 
+def _async_register_thermometer_proxy(hass: HomeAssistant, data: dict):
+    if data["proxy_registered"]:
+        return
+    hass.http.register_view(AquaelThermometerProxyView)
+    data["proxy_registered"] = True
+
+
+class AquaelThermometerProxyView(HomeAssistantView):
+    url = "/api/aquael_link/thermometer/{entry_id}/{resource}"
+    name = "api:aquael_link:thermometer"
+    requires_auth = True
+
+    async def get(self, request, entry_id, resource):
+        if resource not in {"readDATA", "readADC", "all.csv", "notifi.csv"}:
+            raise web.HTTPNotFound()
+
+        hass = request.app["hass"]
+        coordinator = hass.data.get(DOMAIN, {}).get("coordinators", {}).get(entry_id)
+        if coordinator is None or coordinator.device_type != TYPE_THERMOMETER:
+            raise web.HTTPNotFound()
+
+        try:
+            session = async_get_clientsession(hass)
+            async with session.get(
+                f"http://{coordinator.ip}/{resource}",
+                timeout=ClientTimeout(total=10),
+            ) as response:
+                body = await response.read()
+                content_type = response.headers.get("Content-Type", "text/plain")
+                return web.Response(
+                    body=body,
+                    status=response.status,
+                    headers={"Content-Type": content_type},
+                )
+        except (ClientError, TimeoutError) as err:
+            _LOGGER.warning("Thermometer proxy request failed for %s: %s", resource, err)
+            raise web.HTTPBadGateway(text="Aquael thermometer is unavailable") from err
+
+
 async def _async_register_panel(hass: HomeAssistant, data: dict):
     if data["panel_registered"]:
         return
@@ -88,7 +131,7 @@ async def _async_register_panel(hass: HomeAssistant, data: dict):
             frontend_url_path=PANEL_URL_PATH,
             sidebar_title="Aquael Link",
             sidebar_icon="mdi:fishbowl-outline",
-            module_url=f"{PANEL_STATIC_URL}/aquael-link-panel.js?v=20260612-thermometer-assets-017-v1",
+            module_url=f"{PANEL_STATIC_URL}/aquael-link-panel.js?v=20260612-thermometer-auth-019-v1",
             embed_iframe=False,
             require_admin=False,
         )
@@ -139,7 +182,7 @@ async def websocket_get_panel_devices(hass, connection, msg):
         if device_type == TYPE_THERMOMETER:
             device["chart_url"] = (
                 f"{PANEL_STATIC_URL}/aquael_thermometer/index.html"
-                f"?v=20260612-thermometer-assets-017-v1&ip={ip}"
+                f"?v=20260612-thermometer-auth-019-v1&entry_id={entry.entry_id}"
             )
         elif device_type == TYPE_HYPERMAX:
             device["chart_url"] = f"{PANEL_STATIC_URL}/aquael_hypermax/chart.html?ip={ip}&v=20260610-chart-nullguard-v1"
