@@ -1,5 +1,5 @@
 const PANEL_STATIC_URL = "/aquael_link_panel";
-const PANEL_VERSION = "0.16";
+const PANEL_VERSION = "0.17";
 
 class AquaelLinkPanel extends HTMLElement {
   constructor() {

@@ -88,7 +88,7 @@ async def _async_register_panel(hass: HomeAssistant, data: dict):
             frontend_url_path=PANEL_URL_PATH,
             sidebar_title="Aquael Link",
             sidebar_icon="mdi:fishbowl-outline",
-            module_url=f"{PANEL_STATIC_URL}/aquael-link-panel.js?v=20260611-controls-offset-016-v1",
+            module_url=f"{PANEL_STATIC_URL}/aquael-link-panel.js?v=20260612-thermometer-assets-017-v1",
             embed_iframe=False,
             require_admin=False,
         )
@@ -137,7 +137,10 @@ async def websocket_get_panel_devices(hass, connection, msg):
             "ip": ip,
         }
         if device_type == TYPE_THERMOMETER:
-            device["chart_url"] = f"{PANEL_STATIC_URL}/aquael_thermometer/index.html?ip={ip}"
+            device["chart_url"] = (
+                f"{PANEL_STATIC_URL}/aquael_thermometer/index.html"
+                f"?v=20260612-thermometer-assets-017-v1&ip={ip}"
+            )
         elif device_type == TYPE_HYPERMAX:
             device["chart_url"] = f"{PANEL_STATIC_URL}/aquael_hypermax/chart.html?ip={ip}&v=20260610-chart-nullguard-v1"
             device["entities"] = _panel_entities_for_entry(registry, entry.entry_id)
